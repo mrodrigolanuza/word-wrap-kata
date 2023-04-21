@@ -12,7 +12,7 @@
 
  Desarrollar la función _wordWrap_ que consta de dos parámetros: el primero, el texto, y el segundo, el ancho de columna. 
  
- ##Reflexión sobre la lista de ejemplos previos al desarrollo
+ ### Reflexión sobre la lista de ejemplos previos al desarrollo
  
  En el primer ejemplo, la función recibe un texto corto menor que el ancho de columna, por lo tanto, no necesita añadir un salto de línea. 
  El siguiente, es un texto que debemos partir una vez, luego tenemos una palabra más larga que se debe partir más veces. 
