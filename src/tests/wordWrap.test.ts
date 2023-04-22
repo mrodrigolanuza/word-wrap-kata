@@ -16,8 +16,8 @@ describe("The WordWrap function", ()=>{
     });
 });
 
-//Secuencia de prioridad de transformación: 2 >> De nulo a devolver un literal
+//Secuencia de prioridad de transformación: 4 >> De un valor literal a una variable
 function wordWrap(text: string, columnWidth: number): any {
-    return 'hello';
+    return text;
 }
 
