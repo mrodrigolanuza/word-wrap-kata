@@ -51,22 +51,6 @@ function wordWrapOld(text: string, columnWidth: number): any {
     return wrappedText.concat(wordWrapOld(unwrappedText, columnWidth));
 }
 
-function wordWrapNoPrimitives(text: WrapableText, columnWidth: ColumnWidth): any {
-    if(text.fitsIn(columnWidth)){
-        return text.value();
-    }
-
-    const wrapIndex = getWrapIndex(text.value(), columnWidth.value());
-    const unwrapIndex = getUnwrapIndex(text.value(), columnWidth.value());
-    const wrappedText = text.value().substring(0, wrapIndex).concat('\n');
-    const unwrappedText = text.value().substring(unwrapIndex);
-    return wrappedText.concat(wordWrapNoPrimitives(WrapableText.create(unwrappedText), columnWidth));
-}
-
-function wordWrap(text: string, columnWidth: number): any {
-    return wordWrapNoPrimitives(WrapableText.create(text), ColumnWidth.create(columnWidth));
-}
-
 function getUnwrapIndex(text: string, columnWidth: number) {
     const indexOfWhiteSpace = text.indexOf(' ');
     const canWrapByWhiteSpace = indexOfWhiteSpace > -1 && indexOfWhiteSpace < columnWidth;
@@ -77,6 +61,22 @@ function getWrapIndex(text: string, columnWidth: number) {
     const indexOfWhiteSpace = text.indexOf(' ');
     const canWrapByWhiteSpace = indexOfWhiteSpace > -1 && indexOfWhiteSpace < columnWidth;
     return canWrapByWhiteSpace ? indexOfWhiteSpace : columnWidth;
+}
+
+function wordWrapNoPrimitives(text: WrapableText, columnWidth: ColumnWidth): any {
+    if(text.fitsIn(columnWidth)){
+        return text.value();
+    }
+
+    const wrapIndex = text.wrapIndex(columnWidth);
+    const unwrapIndex = text.unwrapIndex(columnWidth);
+    const wrappedText = text.value().substring(0, wrapIndex).concat('\n');
+    const unwrappedText = text.value().substring(unwrapIndex);
+    return wrappedText.concat(wordWrapNoPrimitives(WrapableText.create(unwrappedText), columnWidth));
+}
+
+function wordWrap(text: string, columnWidth: number): any {
+    return wordWrapNoPrimitives(WrapableText.create(text), ColumnWidth.create(columnWidth));
 }
 
 /*
@@ -121,5 +121,17 @@ class WrapableText{
 
     fitsIn(columnWidth: ColumnWidth):boolean{
         return this.value().length <= columnWidth.value();
+    }
+
+    unwrapIndex(columnWidth: ColumnWidth) {
+        const indexOfWhiteSpace = this.value().indexOf(' ');
+        const canWrapByWhiteSpace = indexOfWhiteSpace > -1 && indexOfWhiteSpace < columnWidth.value();
+        return canWrapByWhiteSpace ? indexOfWhiteSpace + 1 : columnWidth.value();
+    }
+    
+    wrapIndex(columnWidth: ColumnWidth) {
+        const indexOfWhiteSpace = this.value().indexOf(' ');
+        const canWrapByWhiteSpace = indexOfWhiteSpace > -1 && indexOfWhiteSpace < columnWidth.value();
+        return canWrapByWhiteSpace ? indexOfWhiteSpace : columnWidth.value();
     }
 }
