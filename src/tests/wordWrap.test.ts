@@ -19,6 +19,8 @@ describe("The WordWrap function", ()=>{
 
 //Secuencia de prioridad de transformación: 4 >> De un valor literal a una variable
 function wordWrap(text: string, columnWidth: number): any {
+    if(text.length > columnWidth)
+        return text.substring(0, columnWidth) + '\n' + text.substring(columnWidth);
     return text;
 }
 
