@@ -25,6 +25,9 @@ describe("The WordWrap function", ()=>{
 
 //Secuencia de prioridad de transformación: 9 >> Introducir recursión
 function wordWrap(text: string, columnWidth: number): any {
+    if(text === null || text === undefined)
+        return '';
+    
     if(text.length <= columnWidth)
         return text;
 
