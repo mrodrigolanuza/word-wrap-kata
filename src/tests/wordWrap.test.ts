@@ -63,20 +63,18 @@ function getWrapIndex(text: string, columnWidth: number) {
     return canWrapByWhiteSpace ? indexOfWhiteSpace : columnWidth;
 }
 
-function wordWrapNoPrimitives(text: WrapableText, columnWidth: ColumnWidth): any {
+function wordWrapNoPrimitives(text: WrappableText, columnWidth: ColumnWidth): any {
     if(text.fitsIn(columnWidth)){
         return text.value();
     }
 
-    const wrapIndex = text.wrapIndex(columnWidth);
-    const unwrapIndex = text.unwrapIndex(columnWidth);
-    const wrappedText = text.value().substring(0, wrapIndex).concat('\n');
-    const unwrappedText = text.value().substring(unwrapIndex);
-    return wrappedText.concat(wordWrapNoPrimitives(WrapableText.create(unwrappedText), columnWidth));
+    const wrappedText = text.wrappedText(columnWidth);
+    const unwrappedText = text.unwrappedText(columnWidth);
+    return wrappedText.concat(wordWrapNoPrimitives(WrappableText.create(unwrappedText), columnWidth));
 }
 
 function wordWrap(text: string, columnWidth: number): any {
-    return wordWrapNoPrimitives(WrapableText.create(text), ColumnWidth.create(columnWidth));
+    return wordWrapNoPrimitives(WrappableText.create(text), ColumnWidth.create(columnWidth));
 }
 
 /*
@@ -104,15 +102,15 @@ class ColumnWidth{
 /*
 Value object pare el primitivo 'text'
 */
-class WrapableText{
+class WrappableText{
     private constructor(private readonly text:string){}
 
     static create(text:string){
         if(text == null || text === undefined){
-            return new WrapableText('');
+            return new WrappableText('');
         }
             
-        return new WrapableText(text);
+        return new WrappableText(text);
     }
 
     value(){
@@ -123,15 +121,29 @@ class WrapableText{
         return this.value().length <= columnWidth.value();
     }
 
-    unwrapIndex(columnWidth: ColumnWidth) {
-        const indexOfWhiteSpace = this.value().indexOf(' ');
-        const canWrapByWhiteSpace = indexOfWhiteSpace > -1 && indexOfWhiteSpace < columnWidth.value();
-        return canWrapByWhiteSpace ? indexOfWhiteSpace + 1 : columnWidth.value();
+    wrappedText(columnWidth: ColumnWidth){
+        return this.value().substring(0, this.wrapIndex(columnWidth)).concat('\n');
+    }
+
+    unwrappedText(columnWidth: ColumnWidth){
+        return this.value().substring(this.unwrapIndex(columnWidth));
+    }
+
+    private wrapIndex(columnWidth: ColumnWidth) {
+        return this.canWrapByWhiteSpace(columnWidth) ? this.indexOfSpace() 
+                                                     : columnWidth.value();
+    }
+
+    private unwrapIndex(columnWidth: ColumnWidth) {
+        return this.canWrapByWhiteSpace(columnWidth) ? this.indexOfSpace() + 1 
+                                                     : columnWidth.value();
     }
     
-    wrapIndex(columnWidth: ColumnWidth) {
-        const indexOfWhiteSpace = this.value().indexOf(' ');
-        const canWrapByWhiteSpace = indexOfWhiteSpace > -1 && indexOfWhiteSpace < columnWidth.value();
-        return canWrapByWhiteSpace ? indexOfWhiteSpace : columnWidth.value();
+    private indexOfSpace() {
+        return this.value().indexOf(' ');
+    }
+
+    private canWrapByWhiteSpace(columnWidth: ColumnWidth) {
+        return this.indexOfSpace() > -1 && this.indexOfSpace() < columnWidth.value();
     }
 }
