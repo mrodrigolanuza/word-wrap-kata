@@ -16,6 +16,8 @@ describe("The WordWrap function", ()=>{
         expect(wordWrap('longword', 4)).toBe('long\nword');
         expect(wordWrap('reallylongword',4)).toBe('real\nlylo\nngwo\nrd');
         expect(wordWrap('abc def',4)).toBe('abc\ndef');
+        expect(wordWrap('abc def ghi',4)).toBe('abc\ndef\nghi');
+        expect(wordWrap(' abcdf',4)).toBe('\nabcd\nf');
     });
 });
 
@@ -24,8 +26,15 @@ function wordWrap(text: string, columnWidth: number): any {
     if(text.length <= columnWidth)
         return text;
 
-    const wrappedText = text.substring(0, columnWidth) + '\n';
-    const unwrappedText = text.substring(columnWidth);
-    return wrappedText + wordWrap(unwrappedText, columnWidth);
+        let wrappedText;
+        let unwrappedText;
+        if (text.indexOf(' ') > -1 && text.indexOf(' ') < columnWidth) {
+          wrappedText = text.substring(0, text.indexOf(' ')).concat('\n');
+          unwrappedText = text.substring(text.indexOf(' ') + 1);
+        } else {
+          wrappedText = text.substring(0, columnWidth).concat('\n');
+          unwrappedText = text.substring(columnWidth);
+        }
+        return wrappedText.concat(wordWrap(unwrappedText, columnWidth));
 }
 
