@@ -66,7 +66,7 @@ function wordWrapNoPrimitives(text: string, columnWidth: ColumnWidth): any {
 }
 
 function wordWrap(text: string, columnWidth: number): any {
-    return wordWrapNoPrimitives(text, new ColumnWidth(columnWidth));
+    return wordWrapNoPrimitives(text, ColumnWidth.create(columnWidth));
 }
 
 function getUnwrapIndex(text: string, columnWidth: number) {
@@ -87,10 +87,15 @@ Value object para el primitivo 'columnWidth'
 - Contiene un primitivo, el cual será inmutable, con lo que no se podrá acceder a él.
 */
 class ColumnWidth{
-    constructor(private readonly width: number){
+    //Constructor privado
+    private constructor(private readonly width: number){}
+
+    //Método factoría
+    static create(width:number){
         if(width <= 0){
             throw new Error('Only numbers greater than zero are allowed');
         }
+        return new ColumnWidth(width)
     }
 
     value(){
