@@ -13,6 +13,7 @@ Lista de ejemplos a testear:
 describe("The WordWrap function", ()=>{
     it("returns a text where every single line fits within maximun range allowed", ()=>{
         expect(wordWrap('hello', 5)).toBe('hello');
+        expect(wordWrap('longword', 4)).toBe('long\nword');
     });
 });
 
