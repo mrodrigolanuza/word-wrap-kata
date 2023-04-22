@@ -29,6 +29,23 @@
 - wordWrap(null,5) ⇒ ''
 - wordWrap('hello',-5) ⇒ throw exception
 
+## Principio de prioridad de transformación por Robert C. Martin
+
+Pasos para conseguir la generalización de un código que soluciona un problema usando TDD:
+
+1.  **{} ⇒ nil**: de no haber código a devolver nulo.
+2.  **nil ⇒ constant**: de nulo a devolver un valor literal.
+3.  **constant ⇒ constant+**: de un valor literal simple a uno más complejo.
+4.  **constant ⇒ scalar**: de un valor literal a una variable.
+5.  **statement ⇒ statements**: añadir más líneas de código sin condicionales.
+6.  **unconditional ⇒ if**: introducir un condicional
+7.  **scalar ⇒ array**: de variable simple a colección.
+8.  **array ⇒ container**: de colección a contenedor.
+9.  **statement ⇒ recursion**: introducir recursión.
+10. **if ⇒ while**: convertir condicional en bucle.
+11. **expression ⇒ function**: reemplazar expresión con llamada a función.
+12. **variable ⇒ assignment**: mutar el valor de una variable.
+
 ## Preparación entorno (Typescript + Jest):
 
 1.- Clonar la plantilla only-typescript
