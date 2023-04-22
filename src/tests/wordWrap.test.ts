@@ -24,7 +24,7 @@ function wordWrap(text: string, columnWidth: number): any {
         return text;
 
     const wrappedText = text.substring(0, columnWidth) + '\n';
-    const unwrappedText = wordWrap(text.substring(columnWidth), columnWidth);
-    return wrappedText + unwrappedText;
+    const unwrappedText = text.substring(columnWidth);
+    return wrappedText + wordWrap(unwrappedText, columnWidth);
 }
 
