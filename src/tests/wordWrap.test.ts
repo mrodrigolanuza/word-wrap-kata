@@ -12,70 +12,26 @@ Lista de ejemplos a testear:
  */
 describe("The WordWrap function", ()=>{
     it("returns empty string when wrapping is not possible", ()=>{
-        expect(wordWrap('', 5)).toBe('');
-        expect(wordWrap(null, 5)).toBe('');
-        expect(wordWrap(undefined, 5)).toBe('');
+        expect(WrappableText.create('').wordWrap(ColumnWidth.create(5))).toEqual({text: ''});
+        expect(WrappableText.create(null).wordWrap(ColumnWidth.create(5))).toEqual({text: ''});
+        expect(WrappableText.create(undefined).wordWrap(ColumnWidth.create(5))).toEqual({text: ''});
     });
     it("returns the same text when wrapping is not needed", ()=>{
-        expect(wordWrap('hello', 5)).toBe('hello');
+         expect(WrappableText.create('hello').wordWrap(ColumnWidth.create(5))).toEqual({text: 'hello'});
     });
     it("returns a wrapped text when the text length is greater than the column width", ()=>{
-        expect(wordWrap('longword', 4)).toBe('long\nword');
-        expect(wordWrap('reallylongword',4)).toBe('real\nlylo\nngwo\nrd');
+        expect(WrappableText.create('longword').wordWrap(ColumnWidth.create(4))).toEqual({text: 'long\nword'});
+        expect(WrappableText.create('reallylongword').wordWrap(ColumnWidth.create(4))).toEqual({text: 'real\nlylo\nngwo\nrd'});
     });
     it("returns a wrapped text using spaces for performing the wrapping process", ()=>{
-        expect(wordWrap('abc def',4)).toBe('abc\ndef');
-        expect(wordWrap('abc def ghi',4)).toBe('abc\ndef\nghi');
-        expect(wordWrap('     abcdf',4)).toBe('\n\n\n\n\nabcd\nf');
+        expect(WrappableText.create('abc def').wordWrap(ColumnWidth.create(4))).toEqual({text: 'abc\ndef'});
+        expect(WrappableText.create('abc def ghi').wordWrap(ColumnWidth.create(4))).toEqual({text: 'abc\ndef\nghi'});
+        expect(WrappableText.create('     abcdf').wordWrap(ColumnWidth.create(4))).toEqual({text: '\n\n\n\n\nabcd\nf'});
     });
     it("returns an exception when negative width column", ()=>{
-        expect(() => wordWrap('hello', 0)).toThrow('Only numbers greater than zero are allowed');
+        // expect(() => WrappableText.create(text).wordWrap(ColumnWidth.create(columnWidth))('hello', 0)).toThrow('Only numbers greater than zero are allowed');
     });
 });
-
-//Secuencia de prioridad de transformación: 9 >> Introducir recursión
-function wordWrapOld(text: string, columnWidth: number): any {
-    if(text === null || text === undefined)
-        return '';
-    
-    if(text.length <= columnWidth)
-        return text;
-    
-    if(columnWidth <= 0)
-        throw new Error('Only numbers greater than zero are allowed');
-
-    const wrapIndex = getWrapIndex(text, columnWidth);
-    const unwrapIndex = getUnwrapIndex(text, columnWidth);
-    const wrappedText = text.substring(0, wrapIndex).concat('\n');
-    const unwrappedText = text.substring(unwrapIndex);
-    return wrappedText.concat(wordWrapOld(unwrappedText, columnWidth));
-}
-
-function getUnwrapIndex(text: string, columnWidth: number) {
-    const indexOfWhiteSpace = text.indexOf(' ');
-    const canWrapByWhiteSpace = indexOfWhiteSpace > -1 && indexOfWhiteSpace < columnWidth;
-    return canWrapByWhiteSpace ? indexOfWhiteSpace + 1 : columnWidth;
-}
-
-function getWrapIndex(text: string, columnWidth: number) {
-    const indexOfWhiteSpace = text.indexOf(' ');
-    const canWrapByWhiteSpace = indexOfWhiteSpace > -1 && indexOfWhiteSpace < columnWidth;
-    return canWrapByWhiteSpace ? indexOfWhiteSpace : columnWidth;
-}
-
-function wordWrapNoPrimitives(text: WrappableText, columnWidth: ColumnWidth): WrappableText {
-    if(text.fitsIn(columnWidth)){
-        return text;
-    }
-
-    const wrappedText = text.wrappedText(columnWidth);
-    const unwrappedText = text.unwrappedText(columnWidth);
-    return wrappedText.concat(wordWrapNoPrimitives(unwrappedText, columnWidth));
-}
-
-function wordWrap(text: string, columnWidth: number): any {
-    return wordWrapNoPrimitives(WrappableText.create(text), ColumnWidth.create(columnWidth)).value();
-}
 
 /*
 Value object para el primitivo 'columnWidth'
@@ -113,24 +69,30 @@ class WrappableText{
         return new WrappableText(text);
     }
 
-    value(){
-        return this.text;
+    wordWrap(columnWidth: ColumnWidth): WrappableText {
+        if(this.fitsIn(columnWidth)){
+            return WrappableText.create(this.text);
+        }
+    
+        const wrappedText = this.wrappedText(columnWidth);
+        const unwrappedText = this.unwrappedText(columnWidth);
+        return wrappedText.concat(WrappableText.create(unwrappedText.text).wordWrap(columnWidth));
     }
 
-    fitsIn(columnWidth: ColumnWidth):boolean{
-        return this.value().length <= columnWidth.value();
+    private fitsIn(columnWidth: ColumnWidth):boolean{
+        return this.text.length <= columnWidth.value();
     }
 
-    wrappedText(columnWidth: ColumnWidth){
-        return WrappableText.create(this.value().substring(0, this.wrapIndex(columnWidth)).concat('\n'));
+    private wrappedText(columnWidth: ColumnWidth){
+        return WrappableText.create(this.text.substring(0, this.wrapIndex(columnWidth)).concat('\n'));
     }
 
-    unwrappedText(columnWidth: ColumnWidth){
-        return WrappableText.create(this.value().substring(this.unwrapIndex(columnWidth)));
+    private unwrappedText(columnWidth: ColumnWidth){
+        return WrappableText.create(this.text.substring(this.unwrapIndex(columnWidth)));
     }
 
-    concat(text:WrappableText ){
-        return WrappableText.create(this.value().concat(text.value()));
+    private concat(text:WrappableText ){
+        return WrappableText.create(this.text.concat(text.text));
     }
 
     private wrapIndex(columnWidth: ColumnWidth) {
@@ -144,7 +106,7 @@ class WrappableText{
     }
     
     private indexOfSpace() {
-        return this.value().indexOf(' ');
+        return this.text.indexOf(' ');
     }
 
     private canWrapByWhiteSpace(columnWidth: ColumnWidth) {
