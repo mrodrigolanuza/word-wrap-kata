@@ -17,7 +17,7 @@ describe("The WordWrap function", ()=>{
         expect(wordWrap('reallylongword',4)).toBe('real\nlylo\nngwo\nrd');
         expect(wordWrap('abc def',4)).toBe('abc\ndef');
         expect(wordWrap('abc def ghi',4)).toBe('abc\ndef\nghi');
-        expect(wordWrap(' abcdf',4)).toBe('\nabcd\nf');
+        expect(wordWrap('     abcdf',4)).toBe('\n\n\n\n\nabcd\nf');
     });
 });
 
@@ -26,15 +26,22 @@ function wordWrap(text: string, columnWidth: number): any {
     if(text.length <= columnWidth)
         return text;
 
-        let wrappedText;
-        let unwrappedText;
-        if (text.indexOf(' ') > -1 && text.indexOf(' ') < columnWidth) {
-          wrappedText = text.substring(0, text.indexOf(' ')).concat('\n');
-          unwrappedText = text.substring(text.indexOf(' ') + 1);
-        } else {
-          wrappedText = text.substring(0, columnWidth).concat('\n');
-          unwrappedText = text.substring(columnWidth);
-        }
-        return wrappedText.concat(wordWrap(unwrappedText, columnWidth));
+    const wrapIndex = getWrapIndex(text, columnWidth);
+    const unwrapIndex = getUnwrapIndex(text, columnWidth);
+    const wrappedText = text.substring(0, wrapIndex).concat('\n');
+    const unwrappedText = text.substring(unwrapIndex);
+    return wrappedText.concat(wordWrap(unwrappedText, columnWidth));
+}
+
+function getUnwrapIndex(text: string, columnWidth: number) {
+    const indexOfWhiteSpace = text.indexOf(' ');
+    const canWrapByWhiteSpace = indexOfWhiteSpace > -1 && indexOfWhiteSpace < columnWidth;
+    return canWrapByWhiteSpace ? indexOfWhiteSpace + 1 : columnWidth;
+}
+
+function getWrapIndex(text: string, columnWidth: number) {
+    const indexOfWhiteSpace = text.indexOf(' ');
+    const canWrapByWhiteSpace = indexOfWhiteSpace > -1 && indexOfWhiteSpace < columnWidth;
+    return canWrapByWhiteSpace ? indexOfWhiteSpace : columnWidth;
 }
 
