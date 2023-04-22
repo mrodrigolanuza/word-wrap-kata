@@ -19,6 +19,7 @@ describe("The WordWrap function", ()=>{
         expect(wordWrap('abc def ghi',4)).toBe('abc\ndef\nghi');
         expect(wordWrap('     abcdf',4)).toBe('\n\n\n\n\nabcd\nf');
         expect(wordWrap(null, 5)).toBe('');
+        expect(wordWrap(undefined, 5)).toBe('');
     });
 });
 
