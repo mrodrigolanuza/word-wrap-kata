@@ -34,7 +34,7 @@ describe("The WordWrap function", ()=>{
 });
 
 //Secuencia de prioridad de transformación: 9 >> Introducir recursión
-function wordWrap(text: string, columnWidth: number): any {
+function wordWrapOld(text: string, columnWidth: number): any {
     if(text === null || text === undefined)
         return '';
     
@@ -48,7 +48,25 @@ function wordWrap(text: string, columnWidth: number): any {
     const unwrapIndex = getUnwrapIndex(text, columnWidth);
     const wrappedText = text.substring(0, wrapIndex).concat('\n');
     const unwrappedText = text.substring(unwrapIndex);
-    return wrappedText.concat(wordWrap(unwrappedText, columnWidth));
+    return wrappedText.concat(wordWrapOld(unwrappedText, columnWidth));
+}
+
+function wordWrapNoPrimitives(text: string, columnWidth: ColumnWidth): any {
+    if(text === null || text === undefined)
+        return '';
+    
+    if(text.length <= columnWidth.value())
+        return text;
+    
+    const wrapIndex = getWrapIndex(text, columnWidth.value());
+    const unwrapIndex = getUnwrapIndex(text, columnWidth.value());
+    const wrappedText = text.substring(0, wrapIndex).concat('\n');
+    const unwrappedText = text.substring(unwrapIndex);
+    return wrappedText.concat(wordWrapNoPrimitives(unwrappedText, columnWidth));
+}
+
+function wordWrap(text: string, columnWidth: number): any {
+    return wordWrapNoPrimitives(text, new ColumnWidth(columnWidth));
 }
 
 function getUnwrapIndex(text: string, columnWidth: number) {
@@ -63,3 +81,19 @@ function getWrapIndex(text: string, columnWidth: number) {
     return canWrapByWhiteSpace ? indexOfWhiteSpace : columnWidth;
 }
 
+/*
+Value object para el primitivo 'columnWidth'
+- Un value object es un objeto que no es una entidad (no tiene Id) y no se persiste.
+- Contiene un primitivo, el cual será inmutable, con lo que no se podrá acceder a él.
+*/
+class ColumnWidth{
+    constructor(private readonly width: number){
+        if(width <= 0){
+            throw new Error('Only numbers greater than zero are allowed');
+        }
+    }
+
+    value(){
+        return this.width;
+    }
+}
