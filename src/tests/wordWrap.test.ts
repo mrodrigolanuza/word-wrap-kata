@@ -51,22 +51,20 @@ function wordWrapOld(text: string, columnWidth: number): any {
     return wrappedText.concat(wordWrapOld(unwrappedText, columnWidth));
 }
 
-function wordWrapNoPrimitives(text: string, columnWidth: ColumnWidth): any {
-    if(text === null || text === undefined)
-        return '';
-    
-    if(text.length <= columnWidth.value())
-        return text;
-    
-    const wrapIndex = getWrapIndex(text, columnWidth.value());
-    const unwrapIndex = getUnwrapIndex(text, columnWidth.value());
-    const wrappedText = text.substring(0, wrapIndex).concat('\n');
-    const unwrappedText = text.substring(unwrapIndex);
-    return wrappedText.concat(wordWrapNoPrimitives(unwrappedText, columnWidth));
+function wordWrapNoPrimitives(text: WrapableText, columnWidth: ColumnWidth): any {
+    if(text.fitsIn(columnWidth)){
+        return text.value();
+    }
+
+    const wrapIndex = getWrapIndex(text.value(), columnWidth.value());
+    const unwrapIndex = getUnwrapIndex(text.value(), columnWidth.value());
+    const wrappedText = text.value().substring(0, wrapIndex).concat('\n');
+    const unwrappedText = text.value().substring(unwrapIndex);
+    return wrappedText.concat(wordWrapNoPrimitives(WrapableText.create(unwrappedText), columnWidth));
 }
 
 function wordWrap(text: string, columnWidth: number): any {
-    return wordWrapNoPrimitives(text, ColumnWidth.create(columnWidth));
+    return wordWrapNoPrimitives(WrapableText.create(text), ColumnWidth.create(columnWidth));
 }
 
 function getUnwrapIndex(text: string, columnWidth: number) {
@@ -100,5 +98,28 @@ class ColumnWidth{
 
     value(){
         return this.width;
+    }
+}
+
+/*
+Value object pare el primitivo 'text'
+*/
+class WrapableText{
+    private constructor(private readonly text:string){}
+
+    static create(text:string){
+        if(text == null || text === undefined){
+            return new WrapableText('');
+        }
+            
+        return new WrapableText(text);
+    }
+
+    value(){
+        return this.text;
+    }
+
+    fitsIn(columnWidth: ColumnWidth):boolean{
+        return this.value().length <= columnWidth.value();
     }
 }
