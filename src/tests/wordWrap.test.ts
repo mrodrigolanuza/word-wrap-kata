@@ -11,15 +11,24 @@ Lista de ejemplos a testear:
 - wordWrap('hello',-5) ⇒ throw exception
  */
 describe("The WordWrap function", ()=>{
-    it("returns a text where every single line fits within maximun range allowed", ()=>{
+    it("returns empty string when wrapping is not possible", ()=>{
+        expect(wordWrap('', 5)).toBe('');
+        expect(wordWrap(null, 5)).toBe('');
+        expect(wordWrap(undefined, 5)).toBe('');
+    });
+    it("returns the same text when wrapping is not needed", ()=>{
         expect(wordWrap('hello', 5)).toBe('hello');
+    });
+    it("returns a wrapped text when the text length is greater than the column width", ()=>{
         expect(wordWrap('longword', 4)).toBe('long\nword');
         expect(wordWrap('reallylongword',4)).toBe('real\nlylo\nngwo\nrd');
+    });
+    it("returns a wrapped text using spaces for performing the wrapping process", ()=>{
         expect(wordWrap('abc def',4)).toBe('abc\ndef');
         expect(wordWrap('abc def ghi',4)).toBe('abc\ndef\nghi');
         expect(wordWrap('     abcdf',4)).toBe('\n\n\n\n\nabcd\nf');
-        expect(wordWrap(null, 5)).toBe('');
-        expect(wordWrap(undefined, 5)).toBe('');
+    });
+    it("returns an exception when negative width column", ()=>{
         expect(() => wordWrap('hello', 0)).toThrow('Only numbers greater than zero are allowed');
     });
 });
