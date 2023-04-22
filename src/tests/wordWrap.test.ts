@@ -20,7 +20,7 @@ describe("The WordWrap function", ()=>{
         expect(wordWrap('     abcdf',4)).toBe('\n\n\n\n\nabcd\nf');
         expect(wordWrap(null, 5)).toBe('');
         expect(wordWrap(undefined, 5)).toBe('');
-        expect(wordWrap('hello', -5)).toBe('');
+        expect(() => wordWrap('hello', 0)).toThrow('Only numbers greater than zero are allowed');
     });
 });
 
@@ -31,6 +31,9 @@ function wordWrap(text: string, columnWidth: number): any {
     
     if(text.length <= columnWidth)
         return text;
+    
+    if(columnWidth <= 0)
+        throw new Error('Only numbers greater than zero are allowed');
 
     const wrapIndex = getWrapIndex(text, columnWidth);
     const unwrapIndex = getUnwrapIndex(text, columnWidth);
