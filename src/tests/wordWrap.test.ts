@@ -18,13 +18,13 @@ describe("The WordWrap function", ()=>{
     });
 });
 
-//Secuencia de prioridad de transformación: 4 >> De un valor literal a una variable
+//Secuencia de prioridad de transformación: 9 >> Introducir recursión
 function wordWrap(text: string, columnWidth: number): any {
     if(text.length <= columnWidth)
         return text;
 
     const wrappedText = text.substring(0, columnWidth) + '\n';
-    const unwrappedText = text.substring(columnWidth);
+    const unwrappedText = wordWrap(text.substring(columnWidth), columnWidth);
     return wrappedText + unwrappedText;
 }
 
